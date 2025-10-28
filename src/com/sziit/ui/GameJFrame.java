@@ -1,16 +1,31 @@
 package com.sziit.ui;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import java.util.Random;
 
 //游戏界面
 public class GameJFrame extends JFrame {
     int[][] Arr=new int[4][4];
     public GameJFrame() {
+        //初始化菜单
         intiMenu();
+        //打乱照片
         mixPhoto();
+        //初始化照片
         intiPhoto();
+        //背景图片，先放置的图片显示在最上面，所以背景图片慢添加
+        bgphoto();
+        //初始化界面
         intiFrame();
+        //展示界面
+        this.setVisible(true);//显示界面，等所有初始化实现后再展示，写最后
+    }
+    //背景图片
+    private void bgphoto() {
+        JLabel bgJLabel=new JLabel(new ImageIcon("src/resources/ph/bg-totle/bg1-star.png"));
+        bgJLabel.setBounds(51, 15, 600, 750);
+        this.getContentPane().add(bgJLabel);
     }
 
     //初始化照片
@@ -18,12 +33,15 @@ public class GameJFrame extends JFrame {
         //先创图片对象-->创储存的容器JLabel-->把容器添加到界面中
         //打乱图片-->添加图片-->指定图片位置
 //        JLabel jLabel = new JLabel(new ImageIcon());
+        int num=1;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 //将图片添加到容器中
-                JLabel jLabel = new JLabel(new ImageIcon("D:\\Java_Project\\Jigsaw_puzzle\\Jigsawpuzzle_Game\\ph\\star2\\images\\star2_0"+Arr[i][j]+".png"));
+                JLabel jLabel = new JLabel(new ImageIcon("src/resources/ph/shenyuan1/images/shenyuan_0"+num+".png"));
+                num++;
                 //指定图片位置
-                jLabel.setBounds(147*j,147*i,147,147);
+                jLabel.setBounds(147*j+57,147*i+171,147,147);
+                jLabel.setBorder(new BevelBorder(1));
                 //将储存图片的容器加载到界面
                 this.getContentPane().add(jLabel);
             }
@@ -55,12 +73,11 @@ public class GameJFrame extends JFrame {
 
     //初始化界面
     private void intiFrame() {
-        this.setSize(703, 680);//设置界面宽和高
+        this.setSize(703, 840);//设置界面宽和高
         this.setTitle("Jigsaw Puzzle v-1.0");//标题
         this.setAlwaysOnTop(true);//不被覆盖
         this.setLocationRelativeTo(null);//取消初始化界面位于左上角，使其居中
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//关闭，结束进程键
-        this.setVisible(true);//显示界面，等所有初始化实现后再展示，写最后
         this.setLayout(null);//取消图片的初始位置--居中
     }
 
