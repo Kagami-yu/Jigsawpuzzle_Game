@@ -2,6 +2,7 @@ package com.sziit.ui;
 
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -10,6 +11,8 @@ import java.util.Random;
 
 //游戏界面
 public class GameJFrame extends JFrame implements KeyListener, ActionListener {
+
+    Random random = new Random();
     int step;
 
     int[][] Arr = new int[4][4];
@@ -23,13 +26,22 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
     //锁定空图片的坐标
     int x;
     int y;
-    String path = "src/resources/ph/shenyuan1/images";
+    int newX;
+    int newY;
+    static String path;
+    static int imageId;
 
-    //菜单条目
+    static {
+        path = "shenyuan";
+        imageId = 1;
+    }
+
     JMenuItem replyItem = new JMenuItem("重新开始");
     JMenuItem reloadItem = new JMenuItem("重新登陆");
     JMenuItem exitItem = new JMenuItem("退出游戏");
     JMenuItem publicItem = new JMenuItem("公众号");
+    JMenuItem starImage = new JMenuItem("幸运星");
+    JMenuItem syImage = new JMenuItem("来自深渊");
 
     public GameJFrame() {
         //初始化菜单
@@ -37,22 +49,15 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
         //打乱照片
         mixPhoto();
         //初始化照片
-        intiPhoto();
+        intiPhoto(path, imageId);
         //初始化界面
         intiFrame();
         //展示界面
         this.setVisible(true);//显示界面，等所有初始化实现后再展示，写最后
     }
 
-    //背景图片
-    private void bgphoto() {
-        JLabel bgJLabel = new JLabel(new ImageIcon("src/resources/ph/bg-totle/bg1-star.png"));
-        bgJLabel.setBounds(51, 45, 600, 750);
-        this.getContentPane().add(bgJLabel);
-    }
-
     //初始化照片/文本
-    private void intiPhoto() {
+    private void intiPhoto(String path, int imageId) {
         //每次调用清空上一次的数据
         this.getContentPane().removeAll();
         if (result()) {
@@ -64,7 +69,7 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 //将图片添加到容器中
-                JLabel jLabel = new JLabel(new ImageIcon(path + "/shenyuan_0" + Arr[i][j] + ".png"));
+                JLabel jLabel = new JLabel(new ImageIcon("src/resources/ph/" + path + imageId + "/images/" + path + imageId + "_0" + Arr[i][j] + ".png"));
                 //指定图片位置
                 jLabel.setBounds(147 * j + 57, 147 * i + 201, 147, 147);
                 jLabel.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -73,7 +78,9 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
             }
         }
         //添加背景，先放置的图片显示在最上面，所以背景图片慢添加
-        bgphoto();
+        JLabel bgJLabel = new JLabel(new ImageIcon("src/resources/ph/bg-totle/bg1-star.png"));
+        bgJLabel.setBounds(51, 45, 600, 750);
+        this.getContentPane().add(bgJLabel);
         //刷新界面
         this.getContentPane().repaint();
     }
@@ -84,10 +91,14 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
         JMenuBar menuBar = new JMenuBar();
         JMenu navMenu1 = new JMenu("功能");
         JMenu navAboutUs = new JMenu("关于我们");
+        JMenu changeImage = new JMenu("更换图片");
         //将JMenu添加到JMenuBar
         menuBar.add(navMenu1);
         menuBar.add(navAboutUs);
-
+        navMenu1.add(changeImage);
+        //添加条目到更换图片
+        changeImage.add(starImage);
+        changeImage.add(syImage);
         //将条目添加到JMenu
         navMenu1.add(replyItem);
         navMenu1.add(reloadItem);
@@ -100,6 +111,8 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
         reloadItem.addActionListener(this);
         exitItem.addActionListener(this);
         publicItem.addActionListener(this);
+        syImage.addActionListener(this);
+        starImage.addActionListener(this);
     }
 
     //初始化界面
@@ -115,7 +128,6 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
 
     //打乱照片&添加空白快的位置
     private void mixPhoto() {
-        Random random = new Random();
         int temp;
         int[] arr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         //打乱一维数组的顺序
@@ -163,6 +175,36 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
         this.getContentPane().add(stepJLabel);
     }
 
+    //更改展示全图
+    private void changeBgImage(String allImage, int imageId) {
+        this.getContentPane().removeAll();
+        JLabel all = new JLabel(new ImageIcon("src/resources/ph/" + allImage + imageId + "/images/" + allImage + imageId + "All" + imageId + ".png"));
+        all.setBounds(57, 201, 588, 588);
+        this.getContentPane().add(all);
+        JLabel bgJLabel = new JLabel(new ImageIcon("src/resources/ph/bg-totle/bg1-star.png"));
+        bgJLabel.setBounds(51, 45, 600, 750);
+        this.getContentPane().add(bgJLabel);
+        this.getContentPane().repaint();
+    }
+
+    //交换两张图片的方法//旧方法是去除界面图片再重新加载，运行速度慢，这个方法针对窗口内两张图片的交换
+//    private void changeTwoImage(int col, int row) {
+//        showStep();
+//        Component[] components = this.getContentPane().getComponents();//获取添加getContentPane窗口的组件(JLabel/JButton...)
+//        //遍历
+//        for (int i = 0; i < components.length; i++) {
+//            if (components[i] instanceof JLabel) {
+//                JLabel cahngeJLabel = (JLabel) components[i];//指定为JLabel类型的
+//                if (cahngeJLabel.getY() == 147 * col + 57 && cahngeJLabel.getX() == 147 * row + 201
+//                        && cahngeJLabel.getWidth() == 147 && cahngeJLabel.getHeight() == 147) {
+//                    cahngeJLabel.setIcon(new ImageIcon("src/resources/ph/" + path + imageId + "/images/" + path + imageId + "_0" + Arr[col][row] + ".png"));
+//                    this.getContentPane().add(cahngeJLabel);
+//                    break;
+//                }//确定坐标，锁定位置,找到图片就直接break
+//            }
+//        };
+//    }
+
     @Override
     public void keyTyped(KeyEvent e) {
     }
@@ -186,12 +228,14 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
             }
             Arr[x][y] = Arr[x][y - 1];
             Arr[x][y - 1] = 0;
+            newX = x;
+            newY = y - 1;
             //这里不是看JFrame的坐标，而是看二维数组对应的行列
             // ---空白块左移一次，列数减少一次
             y--;
             step++;//记录步数
             //按照新数据加载图片
-            intiPhoto();
+            intiPhoto(path, imageId);
         } else if (code == 38) {
             //往上移
             if (x == 0) {
@@ -199,9 +243,11 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
             }
             Arr[x][y] = Arr[x - 1][y];
             Arr[x - 1][y] = 0;
+            newX = x - 1;
+            newY = y;
             x--;
             step++;//记录步数
-            intiPhoto();
+            intiPhoto(path, imageId);
         } else if (code == 39) {
             //往右移动
             if (y == 3) {
@@ -209,9 +255,11 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
             }
             Arr[x][y] = Arr[x][y + 1];
             Arr[x][y + 1] = 0;
+            newX = x;
+            newY = y + 1;
             y++;
             step++;//记录步数
-            intiPhoto();
+            intiPhoto(path, imageId);
         } else if (code == 40) {
             //往下移
             if (x == 3) {
@@ -219,25 +267,23 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
             }
             Arr[x][y] = Arr[x + 1][y];
             Arr[x + 1][y] = 0;
+            newX = x + 1;
+            newY = y;
             x++;
             step++;//记录步数
-            intiPhoto();
+            intiPhoto(path, imageId);
+            //88--X
         } else if (code == 88) {
             //先除去当前界面的照片
             //已有·界面只需更转图片即可，不用重新设置界面信息
-            this.getContentPane().removeAll();
-            JLabel all = new JLabel(new ImageIcon(path + "/shenyuanAll.png"));
-            all.setBounds(57, 201, 588, 588);
-            this.getContentPane().add(all);
-            bgphoto();
-            this.getContentPane().repaint();
+            changeBgImage(path, imageId);
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         if (e.getKeyCode() == 88) {
-            intiPhoto();
+            intiPhoto(path, imageId);
         }
         if (e.getKeyCode() == 65) {
             Arr = new int[][]{
@@ -246,7 +292,7 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
                     {9, 10, 11, 12},
                     {13, 14, 15, 0}
             };
-            intiPhoto();
+            intiPhoto(path, imageId);
         }
     }
 
@@ -258,7 +304,7 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
         if (obj == replyItem) {
             step = 0;
             mixPhoto();
-            intiPhoto();
+            intiPhoto(path, imageId);
         }//退出游戏
         else if (obj == exitItem) {
             System.exit(0);
@@ -271,7 +317,24 @@ public class GameJFrame extends JFrame implements KeyListener, ActionListener {
             this.getContentPane().add(publicDialog);
         }//重新登录
         else if (obj == reloadItem) {
-
+            this.setVisible(false);
+            new LoadingJFrame();
+        }
+        //选择star图片
+        else if (obj == starImage) {
+            int randNum = random.nextInt(3) + 1;
+            step = 0;
+            path = "star";
+            imageId = randNum;
+            mixPhoto();
+            intiPhoto(path, imageId);
+        } else if (obj == syImage) {
+            int randNum = random.nextInt(1) + 1;
+            step = 0;
+            path = "shenyuan";
+            imageId = randNum;
+            mixPhoto();
+            intiPhoto(path, imageId);
         }
     }
 }
